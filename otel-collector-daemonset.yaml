@@ -1,0 +1,67 @@
+# otel-collector-daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet # Production-correct pattern for node-level data collection
+metadata:
+  name: otel-collector
+  namespace: observability
+  labels:
+    app: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      # 6. Include: ServiceAccount
+      serviceAccountName: otel-collector
+      containers:
+        - name: otel-collector
+          # 7. Use otel/opentelemetry-collector-contrib (current, non-deprecated)
+          image: otel/opentelemetry-collector-contrib:0.90.1
+          imagePullPolicy: IfNotPresent
+          args:
+            # 7. Use correct default entrypoint: tell the collector where to find its config
+            - --config=/conf/otel-collector-config.yaml
+          env:
+            # Downward API to dynamically set the node name for kubeletstats
+            - name: KUBELET_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          volumeMounts:
+            # Mount the ConfigMap
+            - name: config
+              mountPath: /conf
+            # 1. Collect Kubernetes container logs: Mount /var/log/containers from the host
+            - name: host-containers-logs
+              mountPath: /var/log/containers
+              readOnly: true
+            # Required for the filelog receiver to read k3s logs
+            - name: host-pods-logs
+              mountPath: /var/log/pods
+              readOnly: true
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+        # Mount the ConfigMap
+        - name: config
+          configMap:
+            name: otel-collector-config
+            items:
+              - key: otel-collector-config.yaml
+                path: otel-collector-config.yaml
+        # Mount host log directories
+        - name: host-containers-logs
+          hostPath:
+            path: /var/log/containers
+        - name: host-pods-logs
+          hostPath:
+            path: /var/log/pods

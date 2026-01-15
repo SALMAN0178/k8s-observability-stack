@@ -1,0 +1,43 @@
+# otel-rbac-and-ns.yaml
+---
+# 6. Include: Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: observability
+
+---
+# 6. Include: ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-collector
+  namespace: observability
+
+---
+# 6. Include: ClusterRole (Required for Kubelet Stats & Node Logs)
+# This grants access to the /stats/summary endpoint on the Kubelet.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-collector-cr
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes/stats
+    verbs: ["get"]
+
+---
+# 6. Include: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-collector-crb
+subjects:
+  - kind: ServiceAccount
+    name: otel-collector
+    namespace: observability
+roleRef:
+  kind: ClusterRole
+  name: otel-collector-cr
+  apiGroup: rbac.authorization.k8s.io

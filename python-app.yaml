@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: python-metrics-app
+  namespace: observability
+spec:
+  selector:
+    app: python-metrics
+  ports:
+    - name: http-app
+      port: 5000
+      targetPort: 5000
+    - name: http-metrics
+      port: 8000
+      targetPort: 8000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-metrics-app
+  namespace: observability
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-metrics
+  template:
+    metadata:
+      labels:
+        app: python-metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: app
+        image: python:3.9-slim
+        # We use a single string for args to prevent shell parsing errors
+        command: ["/bin/sh", "-c"]
+        args: 
+          - "pip install --no-cache-dir flask prometheus_client && python /app/app.py"
+        ports:
+        - containerPort: 5000
+        - containerPort: 8000
+        volumeMounts:
+        - name: app-code
+          mountPath: /app/app.py
+      volumes:
+      - name: app-code
+        hostPath:
+          path: /home/ze/app.py
+          type: File
