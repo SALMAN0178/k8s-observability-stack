@@ -40,3 +40,12 @@ This project involved significant real-world debugging, which served as a deep d
 ## 📊 Custom PromQL Dashboard
 The final dashboard includes a custom panel monitoring **Requests Per Second (RPS)**:
 `sum(rate(http_requests_total[5m])) by (endpoint)`
+## 📊 Final Dashboard Overview
+
+The following screenshots demonstrate the operational state of the cluster. By utilizing PromQL, I transformed raw metrics into high-level business insights:
+
+* **Service Reliability:** The "App Status" panel provides an instant binary view of pod health (Up/Down).
+* **Traffic Analysis:** The multi-colored bar gauges allow for granular tracking of request distribution across different API endpoints.
+* **Real-time Throughput:** The time-series graph calculates the request rate per second, enabling us to monitor for traffic spikes or anomalies.
+<img width="1024" height="680" alt="Screenshot (18)" src="https://github.com/user-attachments/assets/3eb8fb72-99dd-4a8c-8f99-535b9e07e6e8" />
+<img width="1024" height="687" alt="Screenshot (17)" src="https://github.com/user-attachments/assets/9eb237aa-290c-4361-9a40-27d2d5085242" />
