@@ -10,7 +10,13 @@ The system follows a modern observability pattern:
 3. **Storage**: Prometheus server acting as the time-series database.
 4. **Visualization**: Grafana dashboarding using PromQL for real-time monitoring.
 
+## 🌟 Skills Demonstrated
 
+   **Cloud Native Orchestration: Managing K8s resources (Namespaces, Pods, NodePort Services, and RBAC).
+   **Application Instrumentation: Implementing custom Prometheus metrics (Counters, Histograms) within a Python/Flask runtime.
+   **Telemetry Pipelines: Configuring OpenTelemetry (OTel) collectors for multi-source data ingestion.
+   **Advanced PromQL: Utilizing rate functions, aggregation operators, and label filtering for high-fidelity visualization.
+   **System Debugging: Analyzing container logs, resolving volume mount permissions, and troubleshooting network port-binding               conflicts.
 
 ## 🛠️ Deployment Steps
 To deploy this stack in your own cluster, run the manifests in the following order:
